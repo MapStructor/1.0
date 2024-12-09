@@ -1,0 +1,36 @@
+#comparison-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 153px); /* Adjust height to account for footer height */
+  overflow: hidden; /* Hide any overflow content */
+}
+.map-style {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    border-top: 2px solid #b0691d;
+  }
+
+  .mapboxgl-ctrl-bottom-left {
+    display: none !important;
+  }
+  
+  .mapboxgl-ctrl-bottom-right {
+    bottom: 16px;
+    right: 275px;
+  }
+  
+  .mapboxgl-ctrl-group {
+    height: 30px;
+  }
+  
+  .mapboxgl-ctrl-group > button {
+    display: inline-block;
+  }
+  
+  .mapboxgl-ctrl-group > button + button {
+    border-top: 0;
+    border-left: 1px solid #ddd;
+  }

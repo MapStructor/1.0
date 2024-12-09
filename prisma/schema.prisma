@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Command for refreashing the db: 
+
+// ====> npx prisma generate; npx prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  username       String          @unique
+  password       String
+}
+
+model MapFilterGroup {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  groupName      String
+  label          String
+  groupId        String          @unique
+  maps           Map[]
+  mapfilteritems MapFilterItem[]
+}
+
+model Map {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  mapId       String     @unique
+  longitude   Float
+  latitude    Float
+  mapName     String
+  zoom        Float
+  bearing     Float
+  styleId     String
+  groupId     String
+  zoomLabelId String?    @db.ObjectId
+  zoomLabel   ZoomLabel? @relation(fields: [zoomLabelId], references: [id])
+  infoId      String?
+
+  MapFilterGroup MapFilterGroup? @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+}
+
+model MapFilterItem {
+  id                         String  @id @default(auto()) @map("_id") @db.ObjectId
+  itemName                   String
+  label                      String
+  defaultCheckedForBeforeMap Boolean
+  defaultCheckedForAfterMap  Boolean
+  showInfoButton             Boolean
+  showZoomButton             Boolean
+  itemId                     String  @unique
+  groupId                    String
+
+  mapfiltergroup MapFilterGroup? @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+}
+
+model ZoomLabel {
+  id                          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title                       String
+  minZoom                     Float?
+  zoom                        Float?
+  bearing                     Float?
+  centerLatitude              Float?
+  centerLongitude             Float?
+  topLeftBoundLatitude        Float?
+  topLeftBoundLongitude       Float?
+  bottomRightBoundLatitude    Float?
+  bottomRightBoundLongitude   Float?
+  zoomToBounds                Boolean
+  useTextSizeZoomStyling      Boolean
+  textSizeDefault             Float
+  textSizeStopsZoom1          Int
+  textSizeStopsVal1           Float
+  textSizeStopsZoom2          Int
+  textSizeStopsVal2           Float
+  useTextColorZoomStyling     Boolean
+  textColorDefault            String
+  textColorStopsZoom1         Int
+  textColorStopsVal1          String
+  textColorStopsZoom2         Int
+  textColorStopsVal2          String
+  useTextHaloWidthZoomStyling Boolean
+  textHaloWidthDefault        Float
+  textHaloWidthStopsZoom1     Int
+  textHaloWidthStopsVal1      Float
+  textHaloWidthStopsZoom2     Int
+  textHaloWidthStopsVal2      Float
+  useTextHaloBlurZoomStyling  Boolean
+  textHaloBlurDefault         Float
+  textHaloBlurStopsZoom1      Int
+  textHaloBlurStopsVal1       Float
+  textHaloBlurStopsZoom2      Int
+  textHaloBlurStopsVal2       Float
+  useTextHaloColorZoomStyling Boolean
+  textHaloColorDefault        String
+  textHaloColorStopsZoom1     Int
+  textHaloColorStopsVal1      String
+  textHaloColorStopsZoom2     Int
+  textHaloColorStopsVal2      String
+  useTextOpacityZoomStyling   Boolean
+  textOpacityDefault          Float
+  textOpacityStopsZoom1       Int
+  textOpacityStopsVal1        Float
+  textOpacityStopsZoom2       Int
+  textOpacityStopsVal2        Float
+  Map                         Map[]
+}
+
+model ButtonLink {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  label String
+  url   String
+}
+
+model LayerSection {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String       @unique
+  order       Int
+  layerGroups LayerGroup[]
+}
+
+model LayerGroup {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  name           String       @unique
+  layers         LayerData[]
+  layerSection   LayerSection @relation(fields: [layerSectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  layerSectionId String       @db.ObjectId
+  longitude      String?
+  latitude       String?
+  zoom           Float?
+  bearing        Float?
+  order          Int
+  infoId         String?
+}
+
+type hoverItem {
+  label String
+  type  String
+}
+
+model LayerData {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String      @unique
+  iconColor     String
+  iconType      String
+  label         String
+  longitude     Float?
+  latitude      Float?
+  zoom          Float?
+  bearing       Float?
+  groupName     LayerGroup? @relation(fields: [topLayerClass], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topLayerClass String?     @db.ObjectId
+  infoId        String?
+  type          String
+  sourceType    String
+  sourceUrl     String
+  sourceId      String
+  paint         String?
+  layout        String?
+  sourceLayer   String
+  hover         Boolean
+  time          Boolean
+  click         Boolean
+  hoverStyle    String?
+  clickStyle    String?
+  clickHeader   String?
+  hoverContent  hoverItem[]
+  order         Int
+  viewOrder     Int?
+}
